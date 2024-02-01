@@ -5,6 +5,7 @@
 //  Created by Alessio Moiso on 27.01.24.
 //
 
+#if canImport(AppKit)
 import AppKit
 
 /// A subclass of `NSSegmentedCell` that invokes a closure when
@@ -28,3 +29,4 @@ final class SmartSegmentedCell: NSSegmentedCell {
 		}
 	}
 }
+#endif

@@ -5,6 +5,7 @@
 //  Created by Alessio Moiso on 27.01.24.
 //
 
+#if canImport(AppKit)
 import AppKit
 import SwiftUI
 
@@ -140,3 +141,4 @@ extension SegmentedControl {
 		}
 	}
 }
+#endif

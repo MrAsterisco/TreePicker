@@ -1,7 +1,8 @@
+#if canImport(AppKit)
 import SwiftUI
 
 /// A view that displays a segmented control with menus to support
-/// hierirchal navigation of items.
+/// hierarchal navigation of items.
 ///
 /// # Overview
 ///	You can use a tree picker to display a list of items that can be
@@ -34,7 +35,7 @@ import SwiftUI
 /// 	let supportsAdding: Bool
 /// 	// Optional, defaults to nil
 /// 	let addItemLabel: String?
-///}
+/// }
 /// ```
 ///
 /// Items define the hierarchy using their `children` property.
@@ -47,6 +48,8 @@ import SwiftUI
 /// # Selection
 /// Changing selection in the picker or in one of the menus updates the `selectedItem` picker.
 /// The same can be achieved programmatically by updating the value of the same binding.
+///
+/// Setting the selection to `nil` will cause the picker to deselect all items.
 public struct TreePicker<Item: TreePickerItem>: View {
 	@Binding var items: [Item]
 	@Binding var selectedItem: Item.ID?
@@ -82,3 +85,4 @@ public extension TreePicker {
 		return newSelf
 	}
 }
+#endif

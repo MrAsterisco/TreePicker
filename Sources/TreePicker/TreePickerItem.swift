@@ -5,6 +5,7 @@
 //  Created by Alessio Moiso on 27.01.24.
 //
 
+#if canImport(AppKit)
 import AppKit
 
 /// A type that represent an item to be displayed in a ``TreePicker``.
@@ -29,3 +30,4 @@ public extension TreePickerItem {
 	var supportsAdding: Bool { false }
 	var addItemLabel: String? { nil }
 }
+#endif
