@@ -1,0 +1,14 @@
+{
+  "pins" : [
+    {
+      "identity" : "menuitemview",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/MrAsterisco/MenuItemView",
+      "state" : {
+        "branch" : "main",
+        "revision" : "f7b73422c0b13ce337c277a1d600ccd93c9ccc9c"
+      }
+    }
+  ],
+  "version" : 2
+}

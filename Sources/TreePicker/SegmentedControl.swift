@@ -9,13 +9,15 @@
 import AppKit
 import SwiftUI
 
-struct SegmentedControl<Item: TreePickerItem>: NSViewRepresentable {
+struct SegmentedControl<Item: TreePickerItem>: NSViewRepresentable where Item.Children == Item {
 	typealias NSViewType = NSSegmentedControl
 	
 	@Binding var items: [Item]
 	@Binding var selectedItem: Item.ID?
 	
 	let createNewItemHandler: ((Item.ID) -> ())?
+	let itemViewHandler: ((Item) -> AnyView?)?
+	let wrappingItemView: ((Item) -> NSView?)?
 	
 	fileprivate let segmentedControl = NSSegmentedControl()
 	
@@ -43,8 +45,8 @@ struct SegmentedControl<Item: TreePickerItem>: NSViewRepresentable {
 				if
 					let selectedItem,
 					selectedItem == item.id ||
-						item.children.map({ $0.id as! Item.ID }).contains(selectedItem) ||
-						item.children.flatMap({ $0.children }).map({ $0.id as! Item.ID }).contains(selectedItem)
+						item.children.map({ $0.id }).contains(selectedItem) ||
+						item.children.flatMap({ $0.children }).map({ $0.id }).contains(selectedItem)
 				{
 					nsView.selectedSegment = index
 				}
@@ -55,34 +57,17 @@ struct SegmentedControl<Item: TreePickerItem>: NSViewRepresentable {
 		Coordinator(parent: self)
 	}
 	
-	private func makeMenu(for item: any TreePickerItem, context: Context) -> NSMenu? {
+	private func makeMenu(for item: Item, context: Context) -> NSMenu? {
 		let menu = NSMenu()
 		
 		item.children
-			.forEach { item in
-				let menuItem = NSMenuItem(title: item.label, action: nil, keyEquivalent: "")
-				if let image = item.image {
-					menuItem.image = image
-				}
-				menuItem.target = context.coordinator
-				menuItem.representedObject = item.id
-				
-				if !item.children.isEmpty || item.supportsAdding {
-					menuItem.submenu = makeMenu(for: item, context: context)
-				} else {
-					menuItem.action = #selector(Coordinator.didSelectMenuItem(_:))
-				}
-				
-				if
-					let selectedItem,
-					selectedItem == item.id as! Item.ID ||
-						item.children.map({ $0.id as! Item.ID }).contains(selectedItem) ||
-						item.children.flatMap({ $0.children }).map({ $0.id as! Item.ID }).contains(selectedItem)
-				{
-					menuItem.state = .on
-				}
-
-				menu.addItem(menuItem)
+			.forEach {
+				menu.addItem(
+					menuItem(
+						for: $0,
+						with: context
+					)
+				)
 			}
 		
 		if
@@ -139,6 +124,73 @@ extension SegmentedControl {
 			
 			parent.createNewItemHandler?(representedObject)
 		}
+	}
+}
+
+private extension SegmentedControl {
+	func menuItem(for item: Item, with context: Context) -> NSMenuItem {
+		let menuItem = NSMenuItem(
+			title: item.label,
+			action: nil,
+			keyEquivalent: ""
+		)
+		menuItem.target = context.coordinator
+		menuItem.representedObject = item.id
+		
+		if let image = item.image {
+			menuItem.image = image
+		}
+		
+		if let view = menuItemView(for: item) {
+			menuItem.view = view
+		}
+		
+		if !item.children.isEmpty || item.supportsAdding {
+			menuItem.submenu = makeMenu(for: item, context: context)
+		} else {
+			menuItem.action = #selector(Coordinator.didSelectMenuItem(_:))
+		}
+		
+		if
+			let selectedItem,
+			selectedItem == item.id ||
+				item.children.map({ $0.id }).contains(selectedItem) ||
+				item.children.flatMap({ $0.children }).map({ $0.id }).contains(selectedItem)
+		{
+			menuItem.state = .on
+		}
+		
+		return menuItem
+	}
+	
+	func menuItemView(for item: Item) -> NSView? {
+		guard
+			let view = itemViewHandler?(item)
+		else {
+			return nil
+		}
+		
+		let menuItemView = wrappingItemView?(item) ?? NSView()
+		menuItemView.translatesAutoresizingMaskIntoConstraints = false
+		// This is recommended by Apple to ensure the menu can resize the view
+		// accordingly to the size of the rest of the menu items.
+		// See: https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/MenuList/Articles/ViewsInMenuItems.html
+		menuItemView.autoresizingMask = .width
+		
+		let hostingView = NSHostingView(rootView: view)
+		hostingView.translatesAutoresizingMaskIntoConstraints = false
+		
+		menuItemView.addSubview(hostingView)
+		NSLayoutConstraint.activate([
+			hostingView.topAnchor.constraint(equalTo: menuItemView.layoutMarginsGuide.topAnchor),
+			hostingView.leadingAnchor.constraint(equalTo: menuItemView.layoutMarginsGuide.leadingAnchor),
+			hostingView.bottomAnchor.constraint(equalTo: menuItemView.layoutMarginsGuide.bottomAnchor),
+			hostingView.trailingAnchor.constraint(equalTo: menuItemView.layoutMarginsGuide.trailingAnchor)
+		])
+		
+		menuItemView.frame.size = hostingView.intrinsicContentSize
+		
+		return menuItemView
 	}
 }
 #endif

@@ -7,6 +7,7 @@
 
 #if canImport(AppKit)
 import AppKit
+import SwiftUI
 
 /// A type that represent an item to be displayed in a ``TreePicker``.
 public protocol TreePickerItem: Identifiable, Hashable {

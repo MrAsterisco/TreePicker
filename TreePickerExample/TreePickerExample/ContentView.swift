@@ -7,6 +7,7 @@
 
 import SwiftUI
 import TreePicker
+import MenuItemView
 
 struct Feature: TreePickerItem {
 	let id: String
@@ -97,6 +98,22 @@ struct ContentView: View {
 			.onCreateNewItem { featureId in
 				addingToFeature = featureId
 				isAddingFeature.toggle()
+			}
+			.view { item in
+				VStack {
+					Text(item.id)
+						.frame(maxWidth: .infinity, alignment: .leading)
+						.font(.headline)
+					Text("Click to select me.")
+						.font(.caption)
+						.foregroundStyle(.secondary)
+						.frame(maxWidth: .infinity, alignment: .leading)
+				}
+				.frame(maxWidth: .infinity, alignment: .leading)
+				.padding(4)
+			}
+			.nativeWrappingView { _ in
+				MenuItemView()
 			}
 		}
 		.sheet(item: $addingToFeature) { addingToFeature in

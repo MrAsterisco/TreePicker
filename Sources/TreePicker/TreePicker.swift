@@ -50,11 +50,27 @@ import SwiftUI
 /// The same can be achieved programmatically by updating the value of the same binding.
 ///
 /// Setting the selection to `nil` will cause the picker to deselect all items.
-public struct TreePicker<Item: TreePickerItem>: View {
+///
+/// # Custom Views
+/// `NSMenuItem`s have a `view` property that allows you to completely replace the
+/// content of the menu item with a custom view. You can provide a closure that returns any SwiftUI
+/// view to take advantage of this feature.
+///
+/// To do that, use the ``view(for:)`` method.
+///
+/// - warning: Providing custom views in menu items is not supported for top-level elements. The
+/// closure will only be invoked for children.
+/// - note: This functionality is not well implemented in the AppKit: while you can provide a custom view,
+/// you will immediately lose access to all the behaviors that are normally implemented by menus, such as
+/// highlighting, flashing on click, and more. You can provide a custom wrapping view using ``nativeWrappingView(for:)``,
+/// if you wish to reimplement these features (or use [MenuItemView](https://github.com/MrAsterisco/MenuItemView)).
+public struct TreePicker<Item: TreePickerItem>: View where Item.Children == Item {
 	@Binding var items: [Item]
 	@Binding var selectedItem: Item.ID?
 	
-	var createNewItemHandler: ((Item.ID) -> ())? = nil
+	var createNewItemHandler: ((Item.ID) -> ())?
+	var itemViewHandler: ((Item) -> AnyView?)?
+	var wrappingItemNativeView: ((Item) -> NSView?)?
 	
 	/// Create a new picker with the given items and selection.
 	///
@@ -70,7 +86,9 @@ public struct TreePicker<Item: TreePickerItem>: View {
 		SegmentedControl(
 			items: $items,
 			selectedItem: $selectedItem,
-			createNewItemHandler: createNewItemHandler
+			createNewItemHandler: createNewItemHandler,
+			itemViewHandler: itemViewHandler,
+			wrappingItemView: wrappingItemNativeView
 		)
 	}
 }
@@ -79,9 +97,40 @@ public extension TreePicker {
 	/// Set the closure to be invoked when the create new menu item is selected.
 	///
 	/// - note: This closure is applicable only for items that return `true` to `allowsAdding`.
-	func onCreateNewItem(_ handler: @escaping (Item.ID) -> ()) -> some View {
+	func onCreateNewItem(_ handler: @escaping (Item.ID) -> ()) -> Self {
 		var newSelf = self
 		newSelf.createNewItemHandler = handler
+		return newSelf
+	}
+	
+	/// Set the closure to be invoked when a view for an item needs to be created.
+	///
+	/// - note: If you return a non `nil` value for the item, it will be used as view for the
+	/// corresponding menu item.
+	/// - warning: Top-level items that are represented in the segmented control do not support
+	/// this option; the handler will not be invoked for those items, it will only be invoked for children.
+	func view<Content: View>(for viewHandler: @escaping (Item) -> Content?) -> Self {
+		var newSelf = self
+		newSelf.itemViewHandler = {
+			guard let view = viewHandler($0) else { return nil }
+			return AnyView(view)
+		}
+		return newSelf
+	}
+	
+	/// Set the closure to be invoked when wrapping items inside a menu item.
+	///
+	/// The resulting view, if not `nil`, will be used to wrap items that return a non-`nil` value to ``view(for:)``.
+	/// This is particularly useful to provide native menu-like functionalities in the TreePicker, as the `NSMenuItem` stops
+	/// providing basic features such as highlighting when a view is assigned.
+	///
+	/// - note: This function expects an `NSView` to be returned, hence it can only be used in code that can import `AppKit`.
+	///
+	/// - seealso: Checkout [MenuItemView](https://github.com/MrAsterisco/MenuItemView) for an already built implementation
+	/// that simulates a normal menu item.
+	func nativeWrappingView(for wrappingViewHandler: @escaping (Item) -> NSView?) -> Self {
+		var newSelf = self
+		newSelf.wrappingItemNativeView = wrappingViewHandler
 		return newSelf
 	}
 }

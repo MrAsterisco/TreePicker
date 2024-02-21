@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		FA37D2CE2B86637500E2F1C7 /* MenuItemView in Frameworks */ = {isa = PBXBuildFile; productRef = FA37D2CD2B86637500E2F1C7 /* MenuItemView */; };
 		FAD12B842B6AD76200728E47 /* TreePickerExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAD12B832B6AD76200728E47 /* TreePickerExampleApp.swift */; };
 		FAD12B862B6AD76200728E47 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAD12B852B6AD76200728E47 /* ContentView.swift */; };
 		FAD12B882B6AD76300728E47 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FAD12B872B6AD76300728E47 /* Assets.xcassets */; };
@@ -29,6 +30,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FAD12B942B6AD78600728E47 /* TreePicker in Frameworks */,
+				FA37D2CE2B86637500E2F1C7 /* MenuItemView in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -89,6 +91,7 @@
 			name = TreePickerExample;
 			packageProductDependencies = (
 				FAD12B932B6AD78600728E47 /* TreePicker */,
+				FA37D2CD2B86637500E2F1C7 /* MenuItemView */,
 			);
 			productName = TreePickerExample;
 			productReference = FAD12B802B6AD76200728E47 /* TreePickerExample.app */;
@@ -120,6 +123,7 @@
 			mainGroup = FAD12B772B6AD76200728E47;
 			packageReferences = (
 				FAD12B922B6AD78600728E47 /* XCLocalSwiftPackageReference ".." */,
+				FA37D2CC2B86637500E2F1C7 /* XCRemoteSwiftPackageReference "MenuItemView" */,
 			);
 			productRefGroup = FAD12B812B6AD76200728E47 /* Products */;
 			projectDirPath = "";
@@ -353,7 +357,23 @@
 		};
 /* End XCLocalSwiftPackageReference section */
 
+/* Begin XCRemoteSwiftPackageReference section */
+		FA37D2CC2B86637500E2F1C7 /* XCRemoteSwiftPackageReference "MenuItemView" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/MrAsterisco/MenuItemView";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
+		FA37D2CD2B86637500E2F1C7 /* MenuItemView */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FA37D2CC2B86637500E2F1C7 /* XCRemoteSwiftPackageReference "MenuItemView" */;
+			productName = MenuItemView;
+		};
 		FAD12B932B6AD78600728E47 /* TreePicker */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = TreePicker;
