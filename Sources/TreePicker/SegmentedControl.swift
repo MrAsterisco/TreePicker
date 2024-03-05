@@ -18,6 +18,7 @@ struct SegmentedControl<Item: TreePickerItem>: NSViewRepresentable where Item.Ch
 	let createNewItemHandler: ((Item.ID) -> ())?
 	let itemViewHandler: ((Item) -> AnyView?)?
 	let wrappingItemView: ((Item) -> NSView?)?
+	let segmentWidthHandler: ((Item) -> CGFloat?)?
 	
 	fileprivate let segmentedControl = NSSegmentedControl()
 	
@@ -41,6 +42,10 @@ struct SegmentedControl<Item: TreePickerItem>: NSViewRepresentable where Item.Ch
 				
 				nsView.setShowsMenuIndicator(menu != nil, forSegment: index)
 				nsView.setMenu(menu, forSegment: index)
+				
+				if let width = segmentWidthHandler?(item) {
+					nsView.setWidth(width, forSegment: index)
+				}
 				
 				if
 					let selectedItem,

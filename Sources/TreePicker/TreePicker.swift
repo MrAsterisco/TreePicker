@@ -71,6 +71,7 @@ public struct TreePicker<Item: TreePickerItem>: View where Item.Children == Item
 	var createNewItemHandler: ((Item.ID) -> ())?
 	var itemViewHandler: ((Item) -> AnyView?)?
 	var wrappingItemNativeView: ((Item) -> NSView?)?
+	var segmentWidthHandler: ((Item) -> CGFloat?)?
 	
 	/// Create a new picker with the given items and selection.
 	///
@@ -88,7 +89,8 @@ public struct TreePicker<Item: TreePickerItem>: View where Item.Children == Item
 			selectedItem: $selectedItem,
 			createNewItemHandler: createNewItemHandler,
 			itemViewHandler: itemViewHandler,
-			wrappingItemView: wrappingItemNativeView
+			wrappingItemView: wrappingItemNativeView,
+			segmentWidthHandler: segmentWidthHandler
 		)
 	}
 }
@@ -131,6 +133,19 @@ public extension TreePicker {
 	func nativeWrappingView(for wrappingViewHandler: @escaping (Item) -> NSView?) -> Self {
 		var newSelf = self
 		newSelf.wrappingItemNativeView = wrappingViewHandler
+		return newSelf
+	}
+	
+	/// Set the closure to be invoked when calculating the width of top-level items.
+	///
+	/// If this is not set or when invoked returns `nil`, the system will calculate the width
+	/// automatically.
+	///
+	/// - warning: This option is only invoked for top-level items, as they are represented
+	/// in a segmented control which supports this option. Children are not affected.
+	func widthOfSegment(_ handler: @escaping (Item) -> CGFloat?) -> Self {
+		var newSelf = self
+		newSelf.segmentWidthHandler = handler
 		return newSelf
 	}
 }

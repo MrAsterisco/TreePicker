@@ -115,6 +115,9 @@ struct ContentView: View {
 			.nativeWrappingView { _ in
 				MenuItemView()
 			}
+			.widthOfSegment { _ in
+				120
+			}
 		}
 		.sheet(item: $addingToFeature) { addingToFeature in
 			VStack {
