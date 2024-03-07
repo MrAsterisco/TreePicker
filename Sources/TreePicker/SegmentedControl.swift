@@ -105,7 +105,8 @@ extension SegmentedControl {
 		
 		func didChangeSelectedSegment(_ index: Int) {
 			guard
-				parent.segmentedControl.menu(forSegment: index) == nil
+				parent.segmentedControl.menu(forSegment: index) == nil,
+				parent.items.indices.contains(index)
 			else
 			{
 				return
